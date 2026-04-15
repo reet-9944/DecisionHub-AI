@@ -4,6 +4,9 @@ export const analyzeWithAI = async (domain, input) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ domain, input }),
   });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || `Request failed with status ${res.status}`);
+  }
   return res.json();
 };

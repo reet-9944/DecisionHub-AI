@@ -20,8 +20,8 @@ export default function AIForm({ domain, fields, color = '#7c3aed' }) {
     try {
       const data = await analyzeWithAI(domain, form);
       setResult(data);
-    } catch {
-      setError('Failed to connect to AI engine. Make sure the backend is running on port 5000.');
+    } catch (err) {
+      setError(err.message || 'Failed to connect to AI engine. Make sure the backend is running on port 5000.');
     } finally {
       setLoading(false);
     }
