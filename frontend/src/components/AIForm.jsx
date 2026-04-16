@@ -1,6 +1,5 @@
 ﻿import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Loader from './Loader';
 import ResultPanel from './ResultPanel';
 import { analyzeWithAI } from '../services/api';
 
