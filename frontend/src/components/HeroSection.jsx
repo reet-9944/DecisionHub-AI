@@ -7,7 +7,7 @@ const domainRoutes = {
   healthcare: '/healthcare-dashboard',
 };
 
-const HeroSection = ({ activeDomain }) => {
+const HeroSection = ({ activeDomain, domains, setActiveId }) => {
   const navigate = useNavigate();
 
   const handleCTA = () => {
@@ -103,6 +103,57 @@ const HeroSection = ({ activeDomain }) => {
                 View Menu
               </motion.button>
             </motion.div>
+
+            {/* Domain Switcher Icons — fixed below CTA, hidden on scroll */}
+            {domains && setActiveId && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="flex items-center gap-3 flex-wrap"
+              >
+                {domains.map((domain) => {
+                  const isActive = activeDomain.id === domain.id;
+                  return (
+                    <motion.button
+                      key={domain.id}
+                      onClick={() => setActiveId(domain.id)}
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="relative group"
+                      title={domain.name}
+                    >
+                      <div
+                        className="w-14 h-14 rounded-2xl overflow-hidden relative transition-all duration-300"
+                        style={{
+                          border: isActive ? `2px solid ${domain.theme.accent}` : '2px solid rgba(0,0,0,0.1)',
+                          boxShadow: isActive ? `0 6px 20px ${domain.theme.accent}50` : '0 2px 8px rgba(0,0,0,0.1)',
+                        }}
+                      >
+                        <img
+                          src={domain.iconImage}
+                          alt={domain.name}
+                          className="w-full h-full object-cover"
+                        />
+                        {isActive && (
+                          <div
+                            className="absolute inset-0"
+                            style={{ background: `${domain.theme.accent}30` }}
+                          />
+                        )}
+                      </div>
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                        <div className="px-2 py-1 rounded-lg text-xs font-medium text-white"
+                          style={{ background: domain.theme.accent }}>
+                          {domain.name}
+                        </div>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Right Content - Hero Image */}

@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { domains } from '../data/mockData';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
-import DomainIcons from '../components/DomainIcons';
 import QuoteSection from '../components/QuoteSection';
 import AlternatingDomains from '../components/AlternatingDomains';
 import Floating3DCard from '../components/Floating3DCard';
@@ -17,6 +16,8 @@ const Landing = () => {
 
   return (
     <div className="relative overflow-x-hidden">
+
+      {/* Domain Icon Selector — fixed at bottom, outside all transform parents */}
       {/* Hero Section with Background */}
       <div className="relative min-h-screen">
         {/* Animated Background */}
@@ -53,15 +54,8 @@ const Landing = () => {
 
         {/* Hero Section */}
         <AnimatePresence mode="wait">
-          <HeroSection key={activeId} activeDomain={activeDomain} />
+          <HeroSection key={activeId} activeDomain={activeDomain} domains={domains} setActiveId={setActiveId} />
         </AnimatePresence>
-
-        {/* Domain Icon Selector */}
-        <DomainIcons
-          domains={domains}
-          activeId={activeId}
-          setActiveId={setActiveId}
-        />
       </div>
 
       {/* Scroll Sections */}
