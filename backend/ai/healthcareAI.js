@@ -1,6 +1,7 @@
 const Groq = require('groq-sdk');
 
 const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const DISCLAIMER = {
   en: 'IMPORTANT: This is AI-generated information for educational purposes only. It is NOT a substitute for professional medical advice. Always consult a qualified healthcare provider.',
@@ -102,6 +103,7 @@ Return ONLY the translated raw JSON, no markdown, no explanation.`;
 
     try {
       const translateRes = await getGroq().chat.completions.create({
+      const translateRes = await groq.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: 'You are a professional Hindi translator. Translate English medical text to natural Hindi (Devanagari). Return only raw JSON.' },
