@@ -1,5 +1,6 @@
 const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `You are a certified financial advisor AI. Analyze the user's financial situation and provide personalized investment and savings guidance.
 
@@ -36,11 +37,11 @@ Respond ONLY in raw JSON (no markdown, no code blocks):
 async function analyzeFinance({ income, savings, riskTolerance, financialGoal }) {
   if (!income || !financialGoal) throw new Error('Income and financial goal are required.');
 
-  const response = await groq.chat.completions.create({
+  const response = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: `Monthly Income: $${income}\nCurrent Savings: $${savings || 0}\nRisk Tolerance: ${riskTolerance || 'Moderate'}\nFinancial Goal: ${financialGoal}\n\nProvide financial analysis as raw JSON only.` },
+      { role: 'user', content: `Monthly Income: ${income}\nCurrent Savings: ${savings || 0}\nRisk Tolerance: ${riskTolerance || 'Moderate'}\nFinancial Goal: ${financialGoal}\n\nProvide financial analysis as raw JSON only.` },
     ],
     temperature: 0.4,
     max_tokens: 1024,

@@ -1,5 +1,6 @@
 const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `You are a senior business strategy consultant AI. Analyze the company's situation and provide strategic recommendations.
 
@@ -36,7 +37,7 @@ Respond ONLY in raw JSON (no markdown, no code blocks):
 async function analyzeBusinessStrategy({ industry, companyStage, businessChallenge, teamSize }) {
   if (!industry || !businessChallenge) throw new Error('Industry and business challenge are required.');
 
-  const response = await groq.chat.completions.create({
+  const response = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },

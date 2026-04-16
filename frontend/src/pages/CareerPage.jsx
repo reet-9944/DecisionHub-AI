@@ -1,3 +1,8 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { analyzeWithAI } from '../services/api';
+import ResultPanel from '../components/ResultPanel';
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -518,6 +523,24 @@ function CareerExplorer({ onSelectCareer }) {
 }
 
 export default function CareerPage() {
+  const [result, setResult] = useState(null);
+  const [prefilledRole, setPrefilledRole] = useState('');
+  const formRef = useRef(null);
+  const heroRef = useRef(null);
+  const section2Ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  const scrollToForm = () => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const scrollToSection2 = () => section2Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const handleCareerSelect = (career) => {
+    setPrefilledRole(career.title);
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+  };
+
+  return (
   const navigate = useNavigate();
   const [mode, setMode] = useState('input');
   const [form, setForm] = useState({ currentRole: '', skills: '', experience: '', careerGoal: '' });

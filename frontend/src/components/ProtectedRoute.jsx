@@ -1,4 +1,7 @@
 import React from 'react';
+
+// Auth temporarily bypassed — add Firebase keys to frontend/.env to enable
+export default function ProtectedRoute({ children }) {
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 

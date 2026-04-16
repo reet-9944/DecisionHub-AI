@@ -1,5 +1,6 @@
 const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `You are an expert career coach and talent advisor. Analyze the user's career profile and provide structured professional guidance.
 
@@ -36,7 +37,7 @@ Respond ONLY in raw JSON (no markdown, no code blocks):
 async function analyzeCareer({ currentRole, skills, experience, careerGoal }) {
   if (!currentRole || !careerGoal) throw new Error('Current role and career goal are required.');
 
-  const response = await groq.chat.completions.create({
+  const response = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },

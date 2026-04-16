@@ -1,3 +1,6 @@
+// Firebase stub — add keys to frontend/.env to enable Google auth
+export const auth = null;
+export const googleProvider = null;
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
