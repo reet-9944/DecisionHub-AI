@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 const { analyzeHealthcare } = require('./ai/healthcareAI');
 const { analyzeCareer } = require('./ai/careerAI');
@@ -10,8 +12,10 @@ const { analyzePublicService } = require('./ai/publicServiceAI');
 const { analyzeBusinessStrategy } = require('./ai/businessStrategyAI');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
+app.use('/api/auth', authRoutes);
+app.use('/api/report', reportRoutes);
 
 app.post('/api/analyze', async (req, res) => {
   const { domain, input } = req.body;
