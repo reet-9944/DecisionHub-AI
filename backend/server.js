@@ -10,7 +10,7 @@ const { analyzePublicService } = require('./ai/publicServiceAI');
 const { analyzeBusinessStrategy } = require('./ai/businessStrategyAI');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 app.post('/api/analyze', async (req, res) => {
