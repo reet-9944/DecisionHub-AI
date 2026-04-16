@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { analyzeFinance } from "../services/financeService";
+import AIForm from "../components/AIForm";
 
 const C = {
   bg: "#0A0A0F", bgCard: "#111118", bgCard2: "#16161E",
@@ -599,26 +599,16 @@ function ToolsSection() {
 }
 
 // ─── 6. AI ANALYZE ────────────────────────────────────────────────
-function AISection() {
-  const [form, setForm] = useState({ income: "", savings: "", riskTolerance: "Moderate", financialGoal: "" });
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+const FINANCE_FIELDS = [
+  { key: 'income', label: 'Monthly Income ($)', type: 'number', placeholder: 'e.g. 5000', required: true },
+  { key: 'savings', label: 'Current Savings ($)', type: 'number', placeholder: 'e.g. 20000', required: true },
+  { key: 'riskTolerance', label: 'Risk Tolerance', type: 'select', options: ['Conservative', 'Moderate', 'Aggressive'], required: true },
+  { key: 'financialGoal', label: 'Financial Goal', type: 'textarea', placeholder: 'e.g. Save for retirement, buy a house, build emergency fund...', required: true },
+];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.income || !form.financialGoal) { setError("Income and financial goal are required."); return; }
-    setError(""); setLoading(true);
-    try {
-      const res = await analyzeFinance(form);
-      setResult(res);
-    } catch (err) {
-      setError(err.message || "Analysis failed. Please try again.");
-    } finally { setLoading(false); }
-  };
-
+function AISection({ sectionRef }) {
   return (
-    <section style={{ padding: "60px 0", borderTop: `1px solid ${C.borderLight}` }}>
+    <section ref={sectionRef} style={{ padding: "60px 0", borderTop: `1px solid ${C.borderLight}` }}>
       <Reveal>
         <SectionLabel>AI Powered</SectionLabel>
         <div className="fv-syne" style={{ fontSize: 40, fontWeight: 800, marginBottom: 8 }}>
@@ -626,90 +616,9 @@ function AISection() {
         </div>
         <p style={{ color: C.textMuted, marginBottom: 40 }}>Personalized investment strategy powered by Groq AI</p>
       </Reveal>
-
-      <div style={{ display: "grid", gridTemplateColumns: result ? "1fr 1fr" : "1fr", gap: 32, maxWidth: result ? "100%" : 600, margin: "0 auto" }}>
-        <Reveal delay={0.1}>
-          <div className="fv-card" style={{ padding: 32 }}>
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <div>
-                  <label style={{ fontSize: 12, color: C.textMuted, display: "block", marginBottom: 6 }}>Monthly Income ($) *</label>
-                  <input className="fv-input" type="number" placeholder="e.g. 5000" value={form.income} onChange={e => setForm(f => ({ ...f, income: e.target.value }))} required />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, color: C.textMuted, display: "block", marginBottom: 6 }}>Current Savings ($)</label>
-                  <input className="fv-input" type="number" placeholder="e.g. 20000" value={form.savings} onChange={e => setForm(f => ({ ...f, savings: e.target.value }))} />
-                </div>
-              </div>
-              <div>
-                <label style={{ fontSize: 12, color: C.textMuted, display: "block", marginBottom: 6 }}>Risk Tolerance</label>
-                <select className="fv-select" value={form.riskTolerance} onChange={e => setForm(f => ({ ...f, riskTolerance: e.target.value }))}>
-                  <option>Conservative</option><option>Moderate</option><option>Aggressive</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ fontSize: 12, color: C.textMuted, display: "block", marginBottom: 6 }}>Financial Goal *</label>
-                <textarea className="fv-input" rows={3} placeholder="e.g. Save for retirement, buy a house..." value={form.financialGoal} onChange={e => setForm(f => ({ ...f, financialGoal: e.target.value }))} style={{ resize: "vertical" }} required />
-              </div>
-              {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: C.red }}>{error}</div>}
-              <button type="submit" className="fv-btn" disabled={loading} style={{ width: "100%", padding: "14px" }}>
-                {loading ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}><span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "fv-spin 1s linear infinite", display: "inline-block" }} />Analyzing...</span> : "✦ Analyze with AI"}
-              </button>
-            </form>
-          </div>
-        </Reveal>
-
-        {result && (
-          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
-            style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div className="fv-card" style={{ padding: 24, background: "linear-gradient(135deg,rgba(123,92,240,0.12),rgba(0,229,212,0.06))" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <span style={{ fontSize: 18 }}>🎯</span>
-                <span className="fv-syne" style={{ fontSize: 15, fontWeight: 700 }}>AI Recommendation</span>
-                <div style={{ marginLeft: "auto", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 20, padding: "3px 12px", fontSize: 11, color: C.green }}>{result.confidence}% confidence</div>
-              </div>
-              <p style={{ fontSize: 13, color: C.text, lineHeight: 1.8 }}>{result.recommendation}</p>
-            </div>
-            {result.factors && (
-              <div className="fv-card" style={{ padding: 24 }}>
-                <div className="fv-syne" style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>📊 Key Factors</div>
-                {result.factors.map((f, i) => (
-                  <div key={i} style={{ marginBottom: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 12 }}>
-                      <span style={{ color: C.textMuted }}>{f.label}</span>
-                      <span style={{ color: f.color, fontWeight: 600 }}>{f.value}%</span>
-                    </div>
-                    <div style={{ background: C.borderLight, borderRadius: 4, height: 5, overflow: "hidden" }}>
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${f.value}%` }} transition={{ delay: i * 0.1, duration: 0.8 }}
-                        style={{ height: "100%", background: f.color, borderRadius: 4 }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <div className="fv-card" style={{ padding: 20 }}>
-                <div className="fv-syne" style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>⚡ Actions</div>
-                {result.actions?.map((a, i) => (
-                  <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                    <span style={{ color: C.cyan, fontSize: 11, marginTop: 2 }}>→</span>
-                    <span style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.5 }}>{a}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="fv-card" style={{ padding: 20 }}>
-                <div className="fv-syne" style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>🔀 Alternatives</div>
-                {result.alternatives?.map((a, i) => (
-                  <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                    <span style={{ color: C.gold, fontSize: 11, marginTop: 2 }}>◆</span>
-                    <span style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.5 }}>{a}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </div>
+      <Reveal delay={0.1}>
+        <AIForm domain="finance" fields={FINANCE_FIELDS} color="#7B5CF0" />
+      </Reveal>
     </section>
   );
 }
@@ -749,7 +658,7 @@ function FeaturesSection() {
 }
 
 // ─── 8. CTA ───────────────────────────────────────────────────────
-function CTASection() {
+function CTASection({ analyzeRef }) {
   return (
     <section style={{ padding: "60px 0 80px" }}>
       <Reveal>
@@ -762,7 +671,7 @@ function CTASection() {
             Join 180,000+ users who eliminated financial confusion and built real wealth.
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="fv-btn" style={{ padding: "16px 40px", fontSize: 15 }}>Start Free — No Card Required</button>
+            <button className="fv-btn" onClick={() => analyzeRef.current?.scrollIntoView({ behavior: "smooth" })} style={{ padding: "16px 40px", fontSize: 15 }}>Start Free — No Card Required</button>
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 28, fontSize: 12, color: C.textMuted }}>
             {["✓ 30-day free trial", "✓ No credit card", "✓ Cancel anytime", "✓ Bank-grade security"].map(t => <span key={t}>{t}</span>)}
@@ -775,6 +684,7 @@ function CTASection() {
 
 // ─── MAIN ─────────────────────────────────────────────────────────
 export default function FinancePage() {
+  const analyzeRef = useRef(null);
   return (
     <>
       <style>{CSS}</style>
@@ -785,9 +695,9 @@ export default function FinancePage() {
           <DashboardSection />
           <MarketSection />
           <ToolsSection />
-          <AISection />
+          <AISection sectionRef={analyzeRef} />
           <FeaturesSection />
-          <CTASection />
+          <CTASection analyzeRef={analyzeRef} />
         </div>
       </div>
     </>
