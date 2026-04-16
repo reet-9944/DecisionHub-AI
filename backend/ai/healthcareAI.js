@@ -1,6 +1,6 @@
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const DISCLAIMER =
   'IMPORTANT: This is AI-generated information for educational purposes only. ' +
@@ -52,7 +52,7 @@ async function analyzeHealthcare({ symptoms, age, medicalHistory, urgency }) {
 
 Analyze these symptoms and respond with raw JSON only.`;
 
-  const response = await groq.chat.completions.create({
+  const response = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },

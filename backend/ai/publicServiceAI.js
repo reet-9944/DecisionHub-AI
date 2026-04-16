@@ -1,5 +1,6 @@
 const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `You are a public services navigator AI. Help users find government assistance programs they may qualify for based on their location and situation.
 
@@ -36,7 +37,7 @@ Respond ONLY in raw JSON (no markdown, no code blocks):
 async function analyzePublicService({ location, serviceNeeded, eligibilityDetails }) {
   if (!location || !serviceNeeded) throw new Error('Location and service type are required.');
 
-  const response = await groq.chat.completions.create({
+  const response = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },

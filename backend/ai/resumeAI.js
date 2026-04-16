@@ -1,5 +1,6 @@
 const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `You are an expert resume reviewer and ATS optimization specialist. Analyze the resume and provide detailed improvement feedback.
 
@@ -37,7 +38,7 @@ async function analyzeResume({ resumeText, targetRole }) {
   if (!resumeText || resumeText.trim().length < 50) throw new Error('Please paste your full resume content.');
   if (!targetRole) throw new Error('Target job role is required.');
 
-  const response = await groq.chat.completions.create({
+  const response = await getGroq().chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
