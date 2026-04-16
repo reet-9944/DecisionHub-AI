@@ -53,8 +53,9 @@ router.post('/analyze', upload.single('report'), async (req, res) => {
 
     if (req.file.mimetype === 'application/pdf') {
       // PDF: extract text then analyze
-      const pdfParse = require('pdf-parse');
-      const data = await pdfParse(req.file.buffer);
+      const { PDFParse } = require('pdf-parse');
+      const parser = new PDFParse({ data: req.file.buffer });
+      const data = await parser.getText();
       const text = data.text;
 
       if (!text || text.trim().length < 10) {
