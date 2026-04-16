@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.5); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.8); }
+html { scroll-behavior: smooth; }
+button:focus { outline: none; }
+::selection { background: rgba(139,92,246,0.3); color: white; }

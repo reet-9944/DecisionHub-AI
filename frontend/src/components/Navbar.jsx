@@ -12,6 +12,22 @@ const links = [
   { label: 'Business', path: '/business' },
 ];
 
+const AVATARS = [
+  { id: 1, emoji: '🦊', bg: 'linear-gradient(135deg,#f97316,#fbbf24)' },
+  { id: 2, emoji: '🐼', bg: 'linear-gradient(135deg,#6b7280,#d1d5db)' },
+  { id: 3, emoji: '🦁', bg: 'linear-gradient(135deg,#d97706,#fcd34d)' },
+  { id: 4, emoji: '🐯', bg: 'linear-gradient(135deg,#ea580c,#fb923c)' },
+  { id: 5, emoji: '🐸', bg: 'linear-gradient(135deg,#16a34a,#4ade80)' },
+  { id: 6, emoji: '🐧', bg: 'linear-gradient(135deg,#1d4ed8,#93c5fd)' },
+  { id: 7, emoji: '🦋', bg: 'linear-gradient(135deg,#7c3aed,#c4b5fd)' },
+  { id: 8, emoji: '🐉', bg: 'linear-gradient(135deg,#dc2626,#fca5a5)' },
+  { id: 9, emoji: '🦄', bg: 'linear-gradient(135deg,#db2777,#f9a8d4)' },
+  { id: 10, emoji: '🐺', bg: 'linear-gradient(135deg,#4b5563,#9ca3af)' },
+  { id: 17, emoji: '🤖', bg: 'linear-gradient(135deg,#1e40af,#7c3aed)' },
+  { id: 18, emoji: '👾', bg: 'linear-gradient(135deg,#5b21b6,#8b5cf6)' },
+  { id: 20, emoji: '🦸', bg: 'linear-gradient(135deg,#7c3aed,#06b6d4)' },
+];
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -31,35 +47,13 @@ export default function Navbar() {
   const handleLogout = async () => { await logout(); navigate('/signin'); };
   const avatarKey = `avatar_${user?.id || user?.email}`;
   const savedAvatarId = user ? parseInt(localStorage.getItem(avatarKey)) || null : null;
-  const AVATARS = [
-    { id: 1, emoji: '🦊', bg: 'linear-gradient(135deg,#f97316,#fbbf24)' },
-    { id: 2, emoji: '🐼', bg: 'linear-gradient(135deg,#6b7280,#d1d5db)' },
-    { id: 3, emoji: '🦁', bg: 'linear-gradient(135deg,#d97706,#fcd34d)' },
-    { id: 4, emoji: '🐯', bg: 'linear-gradient(135deg,#ea580c,#fb923c)' },
-    { id: 5, emoji: '🐸', bg: 'linear-gradient(135deg,#16a34a,#4ade80)' },
-    { id: 6, emoji: '🐧', bg: 'linear-gradient(135deg,#1d4ed8,#93c5fd)' },
-    { id: 7, emoji: '🦋', bg: 'linear-gradient(135deg,#7c3aed,#c4b5fd)' },
-    { id: 8, emoji: '🐉', bg: 'linear-gradient(135deg,#dc2626,#fca5a5)' },
-    { id: 9, emoji: '🦄', bg: 'linear-gradient(135deg,#db2777,#f9a8d4)' },
-    { id: 10, emoji: '🐺', bg: 'linear-gradient(135deg,#4b5563,#9ca3af)' },
-    { id: 11, emoji: '🦅', bg: 'linear-gradient(135deg,#0369a1,#38bdf8)' },
-    { id: 12, emoji: '🐬', bg: 'linear-gradient(135deg,#0891b2,#67e8f9)' },
-    { id: 13, emoji: '🐻', bg: 'linear-gradient(135deg,#92400e,#d97706)' },
-    { id: 14, emoji: '🦝', bg: 'linear-gradient(135deg,#374151,#6b7280)' },
-    { id: 15, emoji: '🐙', bg: 'linear-gradient(135deg,#be185d,#f472b6)' },
-    { id: 16, emoji: '🦖', bg: 'linear-gradient(135deg,#065f46,#34d399)' },
-    { id: 17, emoji: '🤖', bg: 'linear-gradient(135deg,#1e40af,#7c3aed)' },
-    { id: 18, emoji: '👾', bg: 'linear-gradient(135deg,#5b21b6,#8b5cf6)' },
-    { id: 19, emoji: '🧙', bg: 'linear-gradient(135deg,#1e3a5f,#06b6d4)' },
-    { id: 20, emoji: '🦸', bg: 'linear-gradient(135deg,#7c3aed,#06b6d4)' },
-  ];
   const currentAvatar = AVATARS.find(a => a.id === savedAvatarId);
   const avatar = user?.photoURL;
   const initials = user?.displayName?.charAt(0)?.toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U';
 
   return (
     <motion.nav
-      initial={{ y: -60, opacity: 0 }}
+      initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
       style={{

@@ -1,6 +1,4 @@
 const Groq = require('groq-sdk');
-
-const getGroq = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const DISCLAIMER = {
@@ -64,7 +62,7 @@ ${isHindi ? 'IMPORTANT: You MUST write ALL text values in Hindi (हिंदी
 
 Analyze these symptoms and respond with raw JSON only.`;
 
-  const response = await getGroq().chat.completions.create({
+  const response = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: getSystemPrompt(lang) },
@@ -102,7 +100,6 @@ ${JSON.stringify(textToTranslate)}
 Return ONLY the translated raw JSON, no markdown, no explanation.`;
 
     try {
-      const translateRes = await getGroq().chat.completions.create({
       const translateRes = await groq.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
         messages: [

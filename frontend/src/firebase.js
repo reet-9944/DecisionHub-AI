@@ -1,6 +1,3 @@
-// Firebase stub — add keys to frontend/.env to enable Google auth
-export const auth = null;
-export const googleProvider = null;
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
@@ -13,6 +10,16 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
+let app, auth, googleProvider;
+
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+} catch (e) {
+  console.warn('Firebase init skipped — add VITE_FIREBASE_* keys to frontend/.env');
+  auth = null;
+  googleProvider = null;
+}
+
+export { auth, googleProvider };

@@ -1,18 +1,3 @@
-import React, { createContext, useContext, useState } from 'react';
-
-const AuthContext = createContext(null);
-
-// Stub auth context — wire up Firebase when keys are added to frontend/.env
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
-  const signup = async () => {};
-  const signin = async () => {};
-  const signinWithGoogle = async () => {};
-  const logout = () => setUser(null);
-
-  return (
-    <AuthContext.Provider value={{ user, loading: false, signup, signin, signinWithGoogle, logout }}>
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
@@ -30,14 +15,10 @@ export function AuthProvider({ children }) {
     if (token) {
       fetch(`${API}/me`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json())
-        .then(data => {
-          if (data.user) setUser(data.user);
-          else localStorage.removeItem('token');
-        })
+        .then(data => { if (data.user) setUser(data.user); })
         .catch(() => localStorage.removeItem('token'))
         .finally(() => setLoading(false));
-    } else {
-      // Also listen for Firebase Google session
+    } else if (auth) {
       const unsub = onAuthStateChanged(auth, (firebaseUser) => {
         if (firebaseUser && !localStorage.getItem('token')) {
           setUser({
@@ -51,6 +32,8 @@ export function AuthProvider({ children }) {
         setLoading(false);
       });
       return unsub;
+    } else {
+      setLoading(false);
     }
   }, []);
 
@@ -79,6 +62,7 @@ export function AuthProvider({ children }) {
   };
 
   const signinWithGoogle = async () => {
+    if (!auth || !googleProvider) throw new Error('Google sign-in not configured.');
     const result = await signInWithPopup(auth, googleProvider);
     const firebaseUser = result.user;
     setUser({
