@@ -1,54 +1,112 @@
 const Groq = require('groq-sdk');
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const SYSTEM_PROMPT = `You are an expert resume reviewer and ATS optimization specialist. Analyze the resume and provide detailed improvement feedback.
-
-Rules:
-- Check for ATS compatibility, keyword density, quantified achievements
-- Be specific about what's missing or weak
-- Provide actionable rewrite suggestions
-- Score honestly based on actual content
+const SYSTEM_PROMPT = `You are an elite resume coach, ATS expert, and career strategist. Perform a deep, comprehensive analysis.
 
 Respond ONLY in raw JSON (no markdown, no code blocks):
 {
-  "recommendation": "2-3 sentence resume assessment and top recommendation",
-  "reasoning": ["step 1", "step 2", "step 3", "step 4", "step 5"],
-  "confidence": <60-95>,
+  "overallScore": <0-100>,
+  "atsScore": <0-100>,
+  "skillMatchScore": <0-100>,
+  "impactScore": <0-100>,
+  "readabilityScore": <0-100>,
+  "recommendation": "2-3 sentence executive summary of the resume",
+  "scoreReasons": {
+    "ats": "reason for ATS score",
+    "skillMatch": "reason for skill match score",
+    "impact": "reason for impact score",
+    "readability": "reason for readability score"
+  },
+  "suggestions": [
+    { "id": 1, "section": "Experience", "weak": "original weak line from resume", "strong": "improved version with action verb + metric", "type": "impact" },
+    { "id": 2, "section": "Summary", "weak": "original weak line", "strong": "improved version", "type": "clarity" },
+    { "id": 3, "section": "Skills", "weak": "original weak line", "strong": "improved version", "type": "keywords" },
+    { "id": 4, "section": "Experience", "weak": "another weak line", "strong": "improved version", "type": "impact" },
+    { "id": 5, "section": "Education", "weak": "weak line", "strong": "improved version", "type": "format" }
+  ],
+  "jobMatch": {
+    "matchPercent": <0-100>,
+    "missingKeywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+    "suggestedKeywords": ["keyword1", "keyword2", "keyword3"],
+    "presentKeywords": ["keyword1", "keyword2", "keyword3", "keyword4"]
+  },
+  "hrScanSections": [
+    { "section": "Name & Contact", "attention": "high", "reason": "First thing recruiters see" },
+    { "section": "Summary/Objective", "attention": "high", "reason": "Sets the tone in 2 seconds" },
+    { "section": "Work Experience", "attention": "high", "reason": "Most scrutinized section" },
+    { "section": "Skills", "attention": "medium", "reason": "Scanned for keyword matches" },
+    { "section": "Education", "attention": "low", "reason": "Glanced at briefly" },
+    { "section": "Certifications", "attention": "medium", "reason": "Noticed if relevant" }
+  ],
+  "rejection": {
+    "shortlistChance": <0-100>,
+    "rejectionChance": <0-100>,
+    "reasons": ["reason1", "reason2", "reason3"]
+  },
+  "skillGap": {
+    "missingSkills": ["skill1", "skill2", "skill3", "skill4"],
+    "roadmap": [
+      { "skill": "skill name", "level": "Beginner", "resource": "resource suggestion", "project": "project idea" },
+      { "skill": "skill name", "level": "Intermediate", "resource": "resource suggestion", "project": "project idea" },
+      { "skill": "skill name", "level": "Advanced", "resource": "resource suggestion", "project": "project idea" }
+    ]
+  },
+  "interviewQuestions": {
+    "technical": [
+      { "q": "question", "difficulty": "Easy" },
+      { "q": "question", "difficulty": "Medium" },
+      { "q": "question", "difficulty": "Hard" }
+    ],
+    "hr": [
+      { "q": "question", "difficulty": "Easy" },
+      { "q": "question", "difficulty": "Medium" }
+    ],
+    "behavioral": [
+      { "q": "question", "difficulty": "Medium" },
+      { "q": "question", "difficulty": "Hard" }
+    ]
+  },
+  "hiddenMistakes": [
+    { "type": "weak_verb", "original": "worked on", "suggestion": "engineered", "line": "context line" },
+    { "type": "passive_voice", "original": "was responsible for", "suggestion": "led", "line": "context line" },
+    { "type": "repetition", "original": "repeated word/phrase", "suggestion": "alternative", "line": "context line" },
+    { "type": "vague", "original": "vague phrase", "suggestion": "specific alternative", "line": "context line" }
+  ],
+  "formattingIssues": ["issue1", "issue2", "issue3"],
+  "improvedResume": "Full rewritten resume text in ATS-friendly format with strong action verbs, quantified achievements, and professional tone. Use plain text with clear section headers.",
   "factors": [
-    { "label": "Keyword Match", "value": <0-100>, "color": "#7c3aed" },
-    { "label": "Quantified Impact", "value": <0-100>, "color": "#10b981" },
-    { "label": "Length Optimization", "value": <0-100>, "color": "#f59e0b" },
-    { "label": "Format Compatibility", "value": <0-100>, "color": "#06b6d4" },
-    { "label": "ATS Score", "value": <0-100>, "color": "#ec4899" }
+    { "label": "ATS Compatibility", "value": <0-100>, "color": "#14b8a6" },
+    { "label": "Skill Match", "value": <0-100>, "color": "#38bdf8" },
+    { "label": "Impact Score", "value": <0-100>, "color": "#818cf8" },
+    { "label": "Readability", "value": <0-100>, "color": "#f59e0b" },
+    { "label": "Keyword Density", "value": <0-100>, "color": "#f97316" }
   ],
-  "radarData": [
-    { "label": "Keywords", "value": <0-100> },
-    { "label": "Impact", "value": <0-100> },
-    { "label": "Length", "value": <0-100> },
-    { "label": "Format", "value": <0-100> },
-    { "label": "Clarity", "value": <0-100> }
-  ],
-  "alternatives": ["alternative approach 1", "alternative approach 2", "alternative approach 3"],
-  "actions": ["action 1", "action 2", "action 3", "action 4", "action 5"],
-  "dataSource": "Groq AI (Llama 3.3 70B) + ATS Algorithm Patterns"
+  "confidence": <70-95>
 }`;
 
-async function analyzeResume({ resumeText, targetRole }) {
-  if (!resumeText || resumeText.trim().length < 50) throw new Error('Please paste your full resume content.');
-  if (!targetRole) throw new Error('Target job role is required.');
+async function analyzeResume({ resumeText, jobDescription, targetRole }) {
+  if (!resumeText || resumeText.trim().length < 50) throw new Error('Resume content is too short. Please paste your full resume.');
+
+  const userMsg = `Target Role: ${targetRole || 'Not specified'}
+Job Description: ${jobDescription || 'Not provided'}
+
+Resume Content:
+${resumeText}
+
+Analyze thoroughly and respond with raw JSON only.`;
 
   const response = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: `Target Role: ${targetRole}\n\nResume Content:\n${resumeText}\n\nAnalyze this resume and respond with raw JSON only.` },
+      { role: 'user', content: userMsg },
     ],
-    temperature: 0.4,
-    max_tokens: 1024,
+    temperature: 0.3,
+    max_tokens: 4096,
   });
 
   const text = response.choices[0]?.message?.content?.trim();
-  if (!text) throw new Error('No response from AI. Please try again.');
+  if (!text) throw new Error('No response from AI.');
   const cleaned = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
   try { return JSON.parse(cleaned); } catch { throw new Error('AI returned unexpected format. Please try again.'); }
 }
